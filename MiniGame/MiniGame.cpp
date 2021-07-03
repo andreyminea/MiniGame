@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "Engine/Utils.h"
 #include <iostream>
+#include <random>
 
 void clampInsideWindow(sf::Vector2f &pos, sf::FloatRect dim, sf::Vector2f screen)
 {
@@ -22,6 +23,24 @@ void clampInsideWindow(sf::Vector2f &pos, sf::FloatRect dim, sf::Vector2f screen
     }
 }
 
+sf::Vector2f generateCircleRandomPosition(float window_size_x, float window_size_y, sf::CircleShape circle)
+{
+    //Generates new random position based on a uniform distribution
+
+    const int max_x_pos = window_size_x - circle.getLocalBounds().height;
+    const int min_x_pos = 0;
+
+    const int max_y_pos = window_size_y - circle.getLocalBounds().width;
+    const int min_y_pos = 0;
+
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> distrib_x(min_x_pos, max_x_pos);
+    std::uniform_int_distribution<> distrib_y(min_y_pos, max_y_pos);
+
+    return sf::Vector2f(distrib_x(gen), distrib_y(gen));
+}
+
 sf::String vectorToString(sf::Vector2f pos)
 {
     sf::String str;
@@ -40,7 +59,14 @@ int main()
     sf::Clock gameClock;
     sf::Text debug;
     sf::Font font;
+
+    #ifdef linux
+    font.loadFromFile("../MiniGame/Fonts/ccR.ttf");
+    #else 
     font.loadFromFile("Fonts/ccR.ttf");
+    #endif
+
+
     debug.setFont(font);
     debug.setFillColor(sf::Color(128, 0, 0));
     debug.setCharacterSize(50);
@@ -78,6 +104,10 @@ int main()
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
         {
             pos.y += movingDist;
+        }
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        {
+            pos = generateCircleRandomPosition(window.getView().getSize().x, window.getView().getSize().y, shape);
         }
         shape.setPosition(pos);
         debug.setString(vectorToString(pos));
