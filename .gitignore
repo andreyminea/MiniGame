@@ -5,7 +5,7 @@ build/
 .vscode/
 
 #Bigi's files
-CMakeLists.txt
+#CMakeLists.txt
 
 
 ## Ignore Visual Studio temporary files, build results, and
